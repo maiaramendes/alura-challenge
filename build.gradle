@@ -23,6 +23,8 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+	implementation("org.hibernate:hibernate-core:${hibernateCoreVersion}")
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:${mongodbVersion}")
 	runtimeOnly("org.springframework.boot:spring-boot-devtools:${springBootVersion}")
 
 	implementation("org.projectlombok:lombok:${lombokVersion}")
