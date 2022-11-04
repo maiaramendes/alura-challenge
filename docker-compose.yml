@@ -1,0 +1,21 @@
+version: "3.2"
+
+services:
+  mongo:
+    image: mongo:4.4.6
+    container_name: mongo-alura-challenge
+    hostname: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=alura-challenge
+      - MONGO_INITDB_ROOT_PASSWORD=alura-challenge
+      - MONGO_INITDB_DATABASE=alura
+      - MONGO_DB_USERNAME=alura-challenge
+      - MONGO_DB_PASSWORD=@Lur4
+    volumes:
+      - ~/mongo:/data/db
+
+volumes:
+  mongo-alura-challenge:
