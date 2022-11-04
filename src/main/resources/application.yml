@@ -1,0 +1,8 @@
+spring:
+  devtools:
+    add-properties: false
+  profiles:
+    default: prod
+    active: prod
+
+
