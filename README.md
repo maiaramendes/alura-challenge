@@ -11,7 +11,7 @@ git@github.com/alura-challenge.git
 
 #### 1. Clean and install the dependencies
 ````bash
-./gradlew clean build
+./gradlew clean install
 ````
 
 #### 2. Run docker-compose
