@@ -27,7 +27,7 @@ public class VideoService {
 
     private final Validator validator;
 
-    private Video findByIdOrThrow(final String id) {
+    public Video findByIdOrThrow(final String id) {
         return videoRepository
                 .findById(id)
                 .orElseThrow(VideoNotFoundException::new);
@@ -60,12 +60,12 @@ public class VideoService {
 
         final var video = videoRepository.save(mapper.toVideo(dto));
 
-        log.info("Video with id #{} was successfully saved!", video.getId());
+        log.info("Video was successfully saved!");
         return mapper.toDTO(video);
     }
 
     public VideoDTO editVideo(final VideoDTO dto) {
-        validateIfIdIsNull(dto.getId());
+        validateIfIdIsBlank(dto.getId());
 
         final var video = findByIdOrThrow(dto.getId());
         final var merged = videoRepository.save(mapper.merge(mapper.toVideo(dto), video));
@@ -75,16 +75,16 @@ public class VideoService {
     }
 
     public void deleteVideo(final String id) {
-        validateIfIdIsNull(id);
+        validateIfIdIsBlank(id);
 
         videoRepository.deleteById(id);
         log.info("Video with id #{} was sucessfully removed.", id);
     }
 
-    private void validateIfIdIsNull(final String id) {
+    public void validateIfIdIsBlank(final String id) {
         log.info("Validating if id field is empty.");
 
-        if (Strings.isEmpty(id)) {
+        if (Strings.isBlank(id)) {
             log.error("Field Id must not be null.");
             throw new RequiredFieldException("Id must not be null");
         }
