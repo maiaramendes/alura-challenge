@@ -9,17 +9,17 @@ Make sure you have your SSH key already configurated. If not, follow the instruc
 git@github.com/alura-challenge-backend-java.git
 ````
 
-#### 1. Clean and install the dependencies
+#### 2. Clean and install the dependencies
 ````bash
 ./gradlew clean install
 ````
 
-#### 2. Run docker-compose
+#### 3. Run docker-compose
 ```bash
 docker compose up 
 ```
 
-#### 3. Run the project
+#### 4. Run the project
 ```bash
 ./gradlew :bootRun
 ```
