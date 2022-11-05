@@ -6,7 +6,7 @@ Make sure you have your SSH key already configurated. If not, follow the instruc
 
 #### 1. Clone the repository and open to the directory. 
 ````bash
-git@github.com/alura-challenge.git
+git@github.com/alura-challenge-backend-java.git
 ````
 
 #### 1. Clean and install the dependencies
