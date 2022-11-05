@@ -24,7 +24,16 @@ docker compose up
 ./gradlew :bootRun
 ```
 
+
 ## Database keys
 | url             | database | username        | password |
 |-----------------|----------|-----------------|----------|
 | localhost:27017 | alura    | alura-challenge | @Lur4    |
+
+## Stack
+- [Java 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+- [Spring](https://spring.io) 
+- [Gradle](https://gradle.org)
+- [Docker](https://www.docker.com)
+- [MongoDB](https://www.mongodb.com)
+- [SDKMAN](https://sdkman.io)
