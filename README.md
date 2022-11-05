@@ -1,5 +1,5 @@
 # #5 Alura Challenge
-Project created to develop alura's challenge! 
+> Project to develop alura's challenge! 
 
 ## Setup and run the project
 Make sure you have your SSH key already configurated. If not, follow the instructions at this [link](https://docs.github.com/pt/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
