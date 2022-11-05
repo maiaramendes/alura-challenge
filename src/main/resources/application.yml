@@ -1,8 +1,16 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /alura
+
 spring:
+  application:
+    name: alura-challenge
   devtools:
     add-properties: false
   profiles:
     default: prod
     active: prod
-
-
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/alura
