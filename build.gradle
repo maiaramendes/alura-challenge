@@ -19,28 +19,41 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven {
+		url "https://plugins.gradle.org/m2/"
+	}
 }
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 	implementation("org.hibernate:hibernate-core:${hibernateCoreVersion}")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:${mongodbVersion}")
-	runtimeOnly("org.springframework.boot:spring-boot-devtools:${springBootVersion}")
-
+	implementation("com.google.guava:guava:${guavaVersion}")
+	implementation("org.springframework.boot:spring-boot-starter-validation:2.5.6")
+	implementation("javax.validation:validation-api:2.0.1.Final")
+	implementation("org.springframework.boot:spring-boot-starter-parent:${springBootVersion}")
+	implementation("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 	implementation("org.projectlombok:lombok:${lombokVersion}")
-	compileOnly("org.projectlombok:lombok:${lombokVersion}")
+	implementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 	annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
-	testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
-}
+	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+	annotationProcessor("org.mapstruct:mapstruct-processor:${mapstructVersion}")
 
-wrapper {
-	gradleVersion = "${gradleWrapperVersion}"
-	distributionType = Wrapper.DistributionType.ALL
+	runtimeOnly("org.springframework.boot:spring-boot-devtools:${springBootVersion}")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+	testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+	testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
 }
 
 ext {
 	javaMainClass = "br.alura.AluraApplication"
+}
+
+test {
+	useJUnitPlatform()
 }
 
 application {
@@ -56,5 +69,12 @@ tasks.register("bootRun") {
 		}
 	}
 	finalizedBy("run")
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs += [
+			'-Amapstruct.suppressGeneratorTimestamp=true',
+			'-Amapstruct.defaultComponentModel=spring'
+	]
 }
 
