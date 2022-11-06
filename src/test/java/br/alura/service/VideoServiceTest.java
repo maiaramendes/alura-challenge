@@ -2,17 +2,16 @@ package br.alura.service;
 
 import br.alura.dto.VideoDTO;
 import br.alura.dto.VideoRequestDTO;
+import br.alura.entity.Category;
 import br.alura.entity.Video;
+import br.alura.exception.EntityNotFoundException;
 import br.alura.exception.RequiredFieldException;
-import br.alura.exception.VideoNotFoundException;
 import br.alura.mapper.VideoMapperImpl;
+import br.alura.mock.CategoryMock;
 import br.alura.mock.VideoMock;
 import br.alura.repository.VideoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class VideoServiceTest {
+class VideoServiceTest {
 
     @InjectMocks
     private VideoService videoService;
@@ -37,6 +36,9 @@ public class VideoServiceTest {
 
     @Mock
     private VideoRepository videoRepository;
+
+    @Mock
+    private CategoryService categoryService;
 
     @Mock
     private Validator validator;
@@ -51,8 +53,10 @@ public class VideoServiceTest {
 
     private static final VideoDTO videoDTO = VideoMock.createVideoDTO();
 
+    private static final Category category = CategoryMock.createCategory();
+
     @Test
-    public void findByIdOrThrow_sucess() {
+    void findByIdOrThrow_sucess() {
         //given
         when(videoRepository.findById(ID)).thenReturn(Optional.of(video));
 
@@ -64,12 +68,12 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void findByIdOrThrow_empty() {
+    void findByIdOrThrow_empty() {
         //given
         when(videoRepository.findById(ID)).thenReturn(Optional.empty());
 
         //when
-        final var exception = assertThrows(VideoNotFoundException.class,
+        final var exception = assertThrows(EntityNotFoundException.class,
                 () -> videoService.findByIdOrThrow(ID));
 
         //then
@@ -77,7 +81,7 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void getAll_success() {
+    void getAll_success() {
         //given
         when(videoRepository.findAll()).thenReturn(videoList);
 
@@ -89,7 +93,7 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void getAll_empty() {
+    void getAll_empty() {
         //given
         when(videoRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -100,7 +104,7 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void findById_success() {
+    void findById_success() {
         //given
         when(videoRepository.findById(ID)).thenReturn(Optional.of(video));
         when(mapper.toDTO(any())).thenCallRealMethod();
@@ -116,12 +120,12 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void findById_empty() {
+    void findById_empty() {
         //given
         when(videoRepository.findById(ID)).thenReturn(Optional.empty());
 
         //when
-        final var exception = assertThrows(VideoNotFoundException.class,
+        final var exception = assertThrows(EntityNotFoundException.class,
                 () -> videoService.findById(ID));
 
         //then
@@ -129,7 +133,7 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void createVideo_success() {
+    void createVideo_success() {
         //given
         when(mapper.toVideo(dto)).thenCallRealMethod();
 
@@ -142,7 +146,21 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void editVideo_success() {
+    void createVideo_whenCategoryNotExists_throw() {
+        //given
+        when(categoryService.findByIdOrThrow(any())).thenThrow(EntityNotFoundException.class);
+
+        //when
+        assertThrows(EntityNotFoundException.class,
+                () -> videoService.createVideo(dto));
+
+        //then
+        verify(videoRepository, never()).save(any());
+        verify(mapper, never()).toDTO(any());
+    }
+
+    @Test
+    void editVideo_success() {
         //given
         when(videoRepository.findById(ID)).thenReturn(Optional.of(video));
         when(mapper.toVideo(videoDTO)).thenCallRealMethod();
@@ -157,12 +175,12 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void editVideo_empty() {
+    void editVideo_empty() {
         //given
         when(videoRepository.findById(ID)).thenReturn(Optional.empty());
 
         //when
-        final var exception = assertThrows(VideoNotFoundException.class,
+        final var exception = assertThrows(EntityNotFoundException.class,
                 () -> videoService.editVideo(videoDTO));
 
         //then
@@ -170,7 +188,7 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void editVideo_idIsNull() {
+    void editVideo_idIsNull() {
         //given
         videoDTO.setId(null);
 
@@ -179,21 +197,36 @@ public class VideoServiceTest {
                 () -> videoService.editVideo(videoDTO));
 
         //then
-        assertEquals("Id must not be null", exception.getMessage());
+        assertEquals("Field id is required", exception.getMessage());
     }
 
     @Test
-    public void deleteVideo_idIsNull() {
+    void editVideo_whenCategoryNotExists_throw() {
+        //given
+        videoDTO.setCategory(ID);
+        when(categoryService.findByIdOrThrow(any())).thenThrow(EntityNotFoundException.class);
+
+        //when
+        assertThrows(EntityNotFoundException.class,
+                () -> videoService.editVideo(videoDTO));
+
+        //then
+        verify(videoRepository, never()).save(any());
+        verify(mapper, never()).toDTO(any());
+    }
+
+    @Test
+    void deleteVideo_idIsNull() {
         //when
         final var exception = assertThrows(RequiredFieldException.class,
                 () -> videoService.deleteVideo(null));
 
         //then
-        assertEquals("Id must not be null", exception.getMessage());
+        assertEquals("Field id is required", exception.getMessage());
     }
 
     @Test
-    public void deleteVideo_success() {
+    void deleteVideo_success() {
         //when
         videoService.deleteVideo(ID);
 
@@ -201,15 +234,29 @@ public class VideoServiceTest {
         verify(videoRepository, times(1)).deleteById(ID);
     }
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {"  ", "\t", "\n"})
-    public void validateIfIdIsBlank_throws(final String param) {
-        //then
-        final var exception = assertThrows(RequiredFieldException.class,
-                () -> videoService.validateIfIdIsBlank(param));
+    @Test
+    void findAllByCategory_success() {
+        //given
+        when(categoryService.findByTitle(any())).thenReturn(Optional.of(category));
+        when(videoRepository.findByCategory_Id(any())).thenReturn(videoList);
+
+        //when
+        final var result = videoService.findAllByCategory(category.getTitle());
 
         //then
-        assertEquals("Id must not be null", exception.getMessage());
+        assertNotEquals(0, result.size());
     }
+
+    @Test
+    void findAllByCategory_categoryNotExists_empty() {
+        //given
+        when(categoryService.findByTitle(any())).thenReturn(Optional.empty());
+
+        //when
+        final var result = videoService.findAllByCategory(category.getTitle());
+
+        //then
+        assertEquals(0, result.size());
+    }
+
 }
