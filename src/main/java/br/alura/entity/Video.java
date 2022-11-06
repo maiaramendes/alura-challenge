@@ -28,6 +28,8 @@ public class Video {
     @NotEmpty
     private String url;
 
+    private Category category = new Category();
+
     @CreatedDate
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
