@@ -3,18 +3,19 @@ package br.alura.service;
 import br.alura.dto.VideoDTO;
 import br.alura.dto.VideoRequestDTO;
 import br.alura.entity.Video;
-import br.alura.exception.RequiredFieldException;
-import br.alura.exception.VideoNotFoundException;
+import br.alura.exception.EntityNotFoundException;
 import br.alura.mapper.VideoMapper;
 import br.alura.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
+import java.util.ArrayList;
 import java.util.List;
+
+import static br.alura.utils.ValidateBlank.validateIfIdIsBlank;
 
 @Slf4j
 @Service
@@ -23,14 +24,16 @@ public class VideoService {
 
     private final VideoMapper mapper;
 
+    private final Validator validator;
+
     private final VideoRepository videoRepository;
 
-    private final Validator validator;
+    private final CategoryService categoryService;
 
     public Video findByIdOrThrow(final String id) {
         return videoRepository
                 .findById(id)
-                .orElseThrow(VideoNotFoundException::new);
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     public List<VideoDTO> getAll() {
@@ -58,6 +61,7 @@ public class VideoService {
             throw new ConstraintViolationException(violations);
         }
 
+        categoryService.findByIdOrThrow(dto.getCategory());
         final var video = videoRepository.save(mapper.toVideo(dto));
 
         log.info("Video was successfully saved!");
@@ -66,6 +70,9 @@ public class VideoService {
 
     public VideoDTO editVideo(final VideoDTO dto) {
         validateIfIdIsBlank(dto.getId());
+        if (null != dto.getCategory()) {
+            categoryService.findByIdOrThrow(dto.getCategory());
+        }
 
         final var video = findByIdOrThrow(dto.getId());
         final var merged = videoRepository.save(mapper.merge(mapper.toVideo(dto), video));
@@ -81,12 +88,21 @@ public class VideoService {
         log.info("Video with id #{} was sucessfully removed.", id);
     }
 
-    public void validateIfIdIsBlank(final String id) {
-        log.info("Validating if id field is empty.");
+    public List<VideoDTO> findAllByCategory(final String search) {
+        final var category = categoryService.findByTitle(search);
 
-        if (Strings.isBlank(id)) {
-            log.error("Field Id must not be null.");
-            throw new RequiredFieldException("Id must not be null");
+        if (category.isPresent()) {
+            return videoRepository.findByCategory_Id(category.get().getId())
+                    .stream()
+                    .map(mapper::toDTO)
+                    .toList();
         }
+
+        return new ArrayList<>();
     }
+
+    public void deleteAll() {
+        videoRepository.deleteAll();
+    }
+
 }

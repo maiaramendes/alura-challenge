@@ -1,8 +1,8 @@
 package br.alura.exception;
 
-public class VideoNotFoundException extends RuntimeException {
+public class EntityNotFoundException extends RuntimeException {
 
-    public VideoNotFoundException() {
+    public EntityNotFoundException() {
         super();
     }
 

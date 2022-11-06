@@ -16,28 +16,37 @@ public class VideoController {
     private final VideoService videoService;
 
     @GetMapping
-    public List<VideoDTO> getAllVideos() {
+    public List<VideoDTO> getAll() {
         return videoService.getAll();
     }
 
+    @GetMapping("/category")
+    public List<VideoDTO> getAllByCategory(@RequestParam final String search) {
+        return videoService.findAllByCategory(search);
+    }
+
     @GetMapping("/{id}")
-    public VideoDTO findVideo(@PathVariable final String id) {
+    public VideoDTO find(@PathVariable final String id) {
         return videoService.findById(id);
     }
 
     @PostMapping
-    public VideoDTO createVideo(@RequestBody final VideoRequestDTO dto) {
+    public VideoDTO create(@RequestBody final VideoRequestDTO dto) {
         return videoService.createVideo(dto);
     }
 
     @PatchMapping
-    public VideoDTO editVideo(@RequestBody final VideoDTO dto) {
+    public VideoDTO edit(@RequestBody final VideoDTO dto) {
         return videoService.editVideo(dto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteVideo(@PathVariable final String id) {
+    public void delete(@PathVariable final String id) {
         videoService.deleteVideo(id);
     }
 
+    @DeleteMapping("/all")
+    public void deleteAll() {
+        videoService.deleteAll();
+    }
 }

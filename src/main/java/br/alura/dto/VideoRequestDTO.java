@@ -19,4 +19,7 @@ public class VideoRequestDTO {
 
     @NotEmpty(message = "Field url is required")
     private String url;
+
+    @Builder.Default
+    private String category = "1";
 }

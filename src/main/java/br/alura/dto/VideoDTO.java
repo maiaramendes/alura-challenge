@@ -16,4 +16,6 @@ public class VideoDTO {
     private String description;
 
     private String url;
+
+    private String category;
 }

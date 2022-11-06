@@ -27,6 +27,7 @@ public class VideoMock {
                 .description("descriptions")
                 .title("titles")
                 .url("urls")
+                .category("63673d5dfcbc70444163d642")
                 .build();
     }
 
@@ -37,6 +38,15 @@ public class VideoMock {
                 .description("descriptions")
                 .title("titles")
                 .url("urls")
+                .build();
+    }
+
+    public static Video createVideoWithCategory() {
+        return new Video().builder()
+                .id("id")
+                .url("url")
+                .description("description")
+                .category(CategoryMock.createCategory())
                 .build();
     }
 }
